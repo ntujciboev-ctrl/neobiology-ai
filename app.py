@@ -11,7 +11,8 @@ GEMINI_API_KEY = "AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"
 
 # --- SERVER UCHUN MUKAMMAL LOGOTIP LOGIKASI ---
 # Dunyodagi har qanday brauzer yuklay oladigan xavfsiz va barqaror havola
-LOGO_URL = "https://postimg.cc"
+LOGO_URL = "LOGO_URL = "https://githubusercontent.com"
+"
 
 st.set_page_config(page_title="NeoBiology AI", page_icon=LOGO_URL, layout="wide")
 
