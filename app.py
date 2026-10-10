@@ -15,7 +15,6 @@ from io import BytesIO
 try:
     GEMINI_API_KEY = st.secrets["AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"]
 except:
-    # Agarda secrets sozlanmagan bo'lsa, xatolik chiqmasligi uchun vaqtincha bo'sh qoldiriladi
     GEMINI_API_KEY = "KALIT_SOZLANMAGAN"
 
 # --- LOGOTIP NOMINI AVTOMATIK ANIQLASH ---
@@ -32,7 +31,7 @@ else:
     st.set_page_config(page_title="NeoBiology Multimedia AI", page_icon="🧬", layout="wide")
 
 # ---- INTERFEYS DIZAYNI ----
-col1, col2 = st.columns()
+col1, col2 = st.columns([1, 8])
 with col1:
     if logo_file:
         st.image(logo_file, width=90)
@@ -66,7 +65,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
             3. 'text_dark' (Matnlar uchun)
 
             Har bir slayd uchun aniq 'title', 'content', 'image_keyword' (slaydga mos inglizcha 1-2 so'zli rasm qidiruv kaliti, masalan 'heart cells') va 'has_chart' (true/false - agarda slaydda statistika, taqqoslash yoki foizlar bo'lsa true qil) bo'lsin.
-            Chart ma'lumotlari uchun 'chart_data' kirit, masalan: {{"categories": ["Erkaklar", "Ayollar"], "values": [45, 55]}}. Agarda has_chart false bo'lsa buni null qil.
+            Chart ma'lumotlari uchun 'chart_data' kirit, masalan: {{"categories": ["Erkaklar", "Ayollar"], "values": [65, 35]}}. Agarda has_chart false bo'lsa buni null qil.
             Javobni faqat quyidagi JSON formatida qaytar, hech qanday qo'shimcha gap yozma:
             {{
                 "colors": {{
@@ -177,3 +176,6 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                             chart.has_legend = False
                         except:
                             pass
+                            
+                    if logo_file:
+                        try:
