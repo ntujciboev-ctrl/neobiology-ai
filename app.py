@@ -22,7 +22,7 @@ LOGO_URL = "https://githubusercontent.com"
 st.set_page_config(page_title="NeoBiology Multimedia AI", page_icon="🧬", layout="wide")
 
 # ---- INTERFEYS DIZAYNI ----
-col1, col2 = st.columns([1, 9])
+col1, col2 = st.columns([1, 8])
 with col1:
     st.image(LOGO_URL, width=90)
 with col2:
