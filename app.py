@@ -65,7 +65,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
             3. 'text_dark' (Matnlar uchun)
 
             Har bir slayd uchun aniq 'title', 'content', 'image_keyword' (slaydga mos inglizcha 1-2 so'zli rasm qidiruv kaliti, masalan 'heart cells') va 'has_chart' (true/false - agarda slaydda statistika, taqqoslash yoki foizlar bo'lsa true qil) bo'lsin.
-            Chart ma'lumotlari uchun 'chart_data' kirit, masalan: {{"categories": ["Erkaklar", "Ayollar"], "values":}}. Agarda has_chart false bo'lsa buni null qil.
+            Chart ma'lumotlari uchun 'chart_data' kirit, masalan: {{"categories": ["Erkaklar", "Ayollar"], "values": [45, 55]}}. Agarda has_chart false bo'lsa buni null qil.
             Javobni faqat quyidagi JSON formatida qaytar, hech qanday qo'shimcha gap yozma:
             {{
                 "colors": {{
@@ -100,7 +100,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
             prs = Presentation()
             prs.slide_width = Inches(13.33)
             prs.slide_height = Inches(7.5)
-            blank_layout = prs.slide_layouts
+            blank_layout = prs.slide_layouts[6]
             
             for index, slide_data in enumerate(data["slides"]):
                 slide = prs.slides.add_slide(blank_layout)
@@ -121,7 +121,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                     border.fill.background(); border.line.color.rgb = ACCENT; border.line.width = Pt(3)
                     
                     t_box = slide.shapes.add_textbox(Inches(1.5), Inches(2.8), Inches(10.33), Inches(2))
-                    p = t_box.text_frame.paragraphs
+                    p = t_box.text_frame.paragraphs[0]
                     p.text = title_text; p.font.size = Pt(48); p.font.bold = True; p.font.name = "Schoolbell"; p.font.color.rgb = ACCENT; p.alignment = PP_ALIGN.CENTER
                 else:
                     bg = slide.shapes.add_shape(1, 0, 0, prs.slide_width, prs.slide_height)
@@ -134,7 +134,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                     main_border.fill.background(); main_border.line.color.rgb = ACCENT; main_border.line.width = Pt(2.5)
                     
                     t_box = slide.shapes.add_textbox(Inches(1.2), Inches(0.6), Inches(11), Inches(1))
-                    p = t_box.text_frame.paragraphs
+                    p = t_box.text_frame.paragraphs[0]
                     p.text = title_text; p.font.size = Pt(34); p.font.bold = True; p.font.name = "Schoolbell"; p.font.color.rgb = BG_DARK
                     
                     # JURNAL MULTIMEDIA VERSTKASI: Matn chapda
@@ -143,7 +143,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                     
                     lines = [l.strip() for l in body_text.split("\n") if l.strip()]
                     for idx, line in enumerate(lines):
-                        p_b = tf_b.paragraphs if idx == 0 else tf_b.add_paragraph()
+                        p_b = tf_b.paragraphs[0] if idx == 0 else tf_b.add_paragraph()
                         p_b.text = line.replace("- ", "• ").replace("*", "")
                         p_b.font.size = Pt(18); p_b.font.name = "Comic Sans MS"; p_b.font.color.rgb = TXT_DARK; p_b.space_after = Pt(12)
                     
@@ -154,7 +154,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                             search_url = f"https://unsplash.com{img_keyword}&per_page=1&client_id=p_Yv4wVv-XqM-HwG5HqRfZC-CqO-E498_r6VpXh1Y2Y"
                             res_search = requests.get(search_url, timeout=5).json()
                             if res_search.get("results"):
-                                img_url = res_search["results"]["urls"]["small"]
+                                img_url = res_search["results"][0]["urls"]["small"]
                             
                             img_res = requests.get(img_url, timeout=5)
                             if img_res.status_code == 200:
@@ -177,4 +177,4 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                         except:
                             pass
                             
-                    # ---- LOGOTIPNI BILDIRISH (ISHLANGAN FIX) ----
+                    # ---- LOGOTIPNI JOYLASHTIRISH ----
