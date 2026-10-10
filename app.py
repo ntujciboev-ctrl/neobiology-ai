@@ -28,7 +28,7 @@ else:
     st.set_page_config(page_title="NeoBiology Multimedia AI", page_icon="🧬", layout="wide")
 
 # ---- INTERFEYS DIZAYNI ----
-col1, col2 = st.columns()
+col1, col2 = st.columns([1, 8])
 with col1:
     if logo_file:
         st.image(logo_file, width=90)
@@ -58,8 +58,8 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
         2. 'accent_color' (Yorqin elementlar va ramkalar uchun)
         3. 'text_dark' (Matnlar uchun)
 
-        Har bir slayd uchun aniq 'title', 'content', 'image_keyword' (slaydga mos inglizcha 1-2 so'zli rasm qidiruv kaliti, masalan 'heart cells') va 'has_chart' (true/false - agarda slaydda statistika, taqqoslash yoki foizlar bo'lsa true qil) bo'lsin.
-        Chart ma'lumotlari uchun 'chart_data' kirit, masalan: {{"categories": ["Erkaklar", "Ayollar"], "values": [55, 45]}}. Agarda has_chart false bo'lsa buni null qil.
+        Har bir slayd uchun aniq 'title', 'content', 'image_keyword' (slaydga mos inglizcha 1-2 so'zli rasm qidiruv kaliti, masalan 'heart cell') va 'has_chart' (true/false - agarda slaydda statistika, taqqoslash yoki foizlar bo'lsa true qil) bo'lsin.
+        Chart ma'lumotlari uchun 'chart_data' kirit, masalan: {{"categories": ["Erkaklar", "Ayollar"], "values": [65, 45]}}. Agarda has_chart false bo'lsa buni null qil.
         Javobni faqat quyidagi JSON formatida qaytar, hech qanday qo'shimcha gap yozma:
         {{
             "colors": {{
@@ -94,7 +94,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
         prs = Presentation()
         prs.slide_width = Inches(13.33)
         prs.slide_height = Inches(7.5)
-        blank_layout = prs.slide_layouts[6] # Toza bo'sh slayd
+        blank_layout = prs.slide_layouts[6]
         
         for index, slide_data in enumerate(data["slides"]):
             slide = prs.slides.add_slide(blank_layout)
@@ -103,7 +103,6 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
             img_keyword = slide_data.get("image_keyword", "biology")
             has_chart = slide_data.get("has_chart", False)
             
-            # ---- 3D RAMKALAR VA FON ----
             if index == 0 or index == len(data["slides"]) - 1:
                 bg = slide.shapes.add_shape(1, 0, 0, prs.slide_width, prs.slide_height)
                 bg.fill.solid(); bg.fill.fore_color.rgb = BG_DARK; bg.line.fill.background()
@@ -131,7 +130,6 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                 p = t_box.text_frame.paragraphs[0]
                 p.text = title_text; p.font.size = Pt(34); p.font.bold = True; p.font.name = "Schoolbell"; p.font.color.rgb = BG_DARK
                 
-                # JURNAL MULTIMEDIA VERSTKASI: Matn chapda
                 b_box = slide.shapes.add_textbox(Inches(1.2), Inches(2.2), Inches(6.5), Inches(4.5))
                 tf_b = b_box.text_frame; tf_b.word_wrap = True
                 
@@ -139,14 +137,11 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                 for idx, line in enumerate(lines):
                     p_b = tf_b.paragraphs[0] if idx == 0 else tf_b.add_paragraph()
                     p_b.text = line.replace("- ", "• ").replace("*", "")
-                    p_b.font.size = Pt(18); p_b.font.name = "Comic Sans MS"; p_b.font.color.rgb = TXT_DARK; p_b.space_after = Pt(12)
+                    p_b.font.size = Pt(18); p_b.font.name = "Comic Sans MS"; p_b.font.color.rgb = TEXT_DARK if 'TEXT_DARK' in locals() else TXT_DARK; p_b.space_after = Pt(12)
                 
-                # ---- MULTIMEDIA 1: AQLLI RASYM QO'SHISH ----
                 if not has_chart:
                     try:
-                        # Pixabay / Unsplash ochiq redirect tizimi orqali rasmni olish
-                        img_url = f"https://unsplash.com" 
-                        # Kalit so'z bo'yicha dinamik qidiruv API linki
+                        img_url = "https://unsplash.com"
                         search_url = f"https://unsplash.com{img_keyword}&per_page=1&client_id=p_Yv4wVv-XqM-HwG5HqRfZC-CqO-E498_r6VpXh1Y2Y"
                         res_search = requests.get(search_url, timeout=5).json()
                         if res_search.get("results"):
@@ -159,7 +154,6 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                     except:
                         pass
                 
-                # ---- MULTIMEDIA 2: AQLLI DYNAMIC DIAGRAMMA CHIZISH ----
                 if has_chart and slide_data.get("chart_data"):
                     try:
                         c_data = slide_data["chart_data"]
@@ -174,12 +168,21 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                         pass
                         
                 if logo_file:
-                    try: slide.shapes.add_picture(logo_file, Inches(11.8), Inches(0.8), width=Inches(0.8))
-                    except: pass
+                    try:
+                        slide.shapes.add_picture(logo_file, Inches(11.8), Inches(0.8), width=Inches(0.8))
+                    except:
+                        pass
         
         file_name = "neobiology_multimedia.pptx"
         prs.save(file_name)
         st.success(f"🎉 NeoBiology Multimedia AI {len(data['slides'])} ta mukammal slayd tayyorladi!")
+        
         with open(file_name, "rb") as file:
-            st.download_button(label="Multimedia Slaydni yuklab olish (.pptx)", data=file, file_name=file_name, mime="application/vnd.openxmlformats-officedocument.presentationml.presentation")
+            st.download_button(
+                label="Multimedia Slaydni yuklab olish (.pptx)", 
+                data=file, 
+                file_name=file_name, 
+                mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
+            )
     except Exception as e:
+        st.error(f"Xatolik yuz berdi: {e}")
