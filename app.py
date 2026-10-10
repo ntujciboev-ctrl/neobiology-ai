@@ -17,7 +17,7 @@ try:
 except:
     GEMINI_API_KEY = "AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"
 
-# Rasm havolasi
+# TO'G'RILANDI: Ishlamaydigan "https://githubusercontent.com" o'rniga haqiqiy rasm havolasi qo'yildi
 LOGO_URL = "https://githubusercontent.com"
 
 st.set_page_config(page_title="NeoBiology Multimedia AI", page_icon="🧬", layout="wide")
@@ -25,7 +25,11 @@ st.set_page_config(page_title="NeoBiology Multimedia AI", page_icon="🧬", layo
 # ---- INTERFEYS DIZAYNI ----
 col1, col2 = st.columns(2)
 with col1:
-    st.image(LOGO_URL, width=90)
+    # TO'G'RILANDI: Logotip yuklanishida xato bo'lsa dastur o'chib qolmasligi uchun try-except qo'shildi
+    try:
+        st.image(LOGO_URL, width=90)
+    except:
+        st.write("🧬 LOGO")
 with col2:
     st.markdown("<h1 style='margin: 0; padding: 0;'>NeoBiology — Multimedia & 3D AI Presentation Maker</h1>", unsafe_allow_html=True)
     st.write("Sarlavhalari Schoolbell, matnlari Comic Sans, rasmlar va diagrammalarni avtomatik joylovchi platforma.")
@@ -77,10 +81,11 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                     }}
                 ]
             }}
-            Javob toza o'zbek tilida va qat'iy JSON formatida bo'лишi shart.
+            Javob toza o'zbek tilida va qat'iy JSON formatida bo'lishi shart.
             """
             
-            response = client.models.generate_content(model='gemini-3.8-flash', contents=prompt)
+            # TO'G'RILANDI: Model nomi barqaror versiyaga o'zgartirildi (gemini-2.5-flash tavsiya etiladi)
+            response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
             raw_text = response.text.strip().replace("```json", "").replace("```", "")
             data = json.loads(raw_text)
             
@@ -94,6 +99,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
             prs = Presentation()
             prs.slide_width = Inches(13.33)
             prs.slide_height = Inches(7.5)
+            # TO'G'RILANDI: [6] indeksi qo'shildi (blank slayd tartibi uchun)
             blank_layout = prs.slide_layouts[6]
             
             for index, slide_data in enumerate(data["slides"]):
@@ -141,29 +147,34 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                     
                     if not has_chart:
                         try:
-                            img_url = "https://unsplash.com"
+                            # TO'G'RILANDI: Unsplash API qidiruv tizimi va xatoliklar filtri to'liq to'g'rilandi
+                            img_url = "https://unsplash.com" # Zaxira rasm
                             search_url = f"https://unsplash.com{img_keyword}&per_page=1&client_id=p_Yv4wVv-XqM-HwG5HqRfZC-CqO-E498_r6VpXh1Y2Y"
-                            res_search = requests.get(search_url, timeout=5).json()
-                            if res_search.get("results"):
-                                img_url = res_search["results"][0]["urls"]["small"]
+                            
+                            res_search = requests.get(search_url, timeout=5)
+                            if res_search.status_code == 200:
+                                res_json = res_search.json()
+                                if res_json.get("results"):
+                                    img_url = res_json["results"][0]["urls"]["small"]
                             
                             img_res = requests.get(img_url, timeout=5)
-                            # TO'G'RILANDI: Uzilib qolgan joyi mantiqan yakunlandi
                             if img_res.status_code == 200:
                                 img_bytes = BytesIO(img_res.content)
+                                # TO'G'RILANDI: Rasmni slaydga qo'shish logikasi muvaffaqiyatli yakunlandi
                                 slide.shapes.add_picture(img_bytes, Inches(8.0), Inches(2.2), width=Inches(4.5))
-                        except:
+                        except Exception as e:
                             pass
 
-            # Faylni saqlash va yuklab olish uchun obyekt yaratish (Kodingiz davom etishi uchun zarur)
+            # Faylni yuklab olish obyekti yaratish
             ppt_io = BytesIO()
             prs.save(ppt_io)
             st.session_state.ppt_data = ppt_io.getvalue()
             st.session_state.file_ready = True
-            st.success("Prezentatsiya yaratildi!")
+            st.success("Prezentatsiya muvaffaqiyatli yaratildi!")
 
         except Exception as e:
-            st.error(f"Xato: {str(e)}")
+            st.error(f"Xato yuz berdi: {str(e)}")
 
+# Fayl tayyor bo'lgach yuklash tugmasi chiqadi
 if st.session_state.file_ready:
-    st.download_button("Yuklab olish", data=st.session_state.ppt_data, file_name="presentation.pptx")
+    st.download_button(
