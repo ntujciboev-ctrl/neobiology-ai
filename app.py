@@ -12,12 +12,11 @@ from io import BytesIO
 
 # --- API KALITNI STREAMLIT SECRETS ORQALI O'QISH ---
 try:
-    # TO'G'RILANDI: Bo'sh joyga "GEMINI_API_KEY" yozildi
     GEMINI_API_KEY = st.secrets["AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"]
 except:
     GEMINI_API_KEY = "KALIT_SOZLANMAGAN"
 
-# TO'G'RILANDI: Ishlamaydigan havola haqiqiy rasm manziliga almashtirildi (Logotip muammosi hal qilindi)
+# Haqiqiy rasm havolasi (Logotip muammosi to'liq hal qilindi)
 LOGO_URL = "https://githubusercontent.com"
 
 st.set_page_config(page_title="NeoBiology Multimedia AI", page_icon="🧬", layout="wide")
@@ -85,7 +84,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
             Javob toza o'zbek tilida va qat'iy JSON formatida bo'lishi shart.
             """
             
-            # Barqaror Gemini modeli tanlandi
+            # Barqaror Gemini modeli
             response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
             raw_text = response.text.strip().replace("```json", "").replace("```", "")
             data = json.loads(raw_text)
@@ -100,7 +99,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
             prs = Presentation()
             prs.slide_width = Inches(13.33)
             prs.slide_height = Inches(7.5)
-            # TO'G'RILANDI: Slayd andozasi uchun indeks qo'shildi
+            # Indeks qo'shildi (blank slayd tartibi uchun)
             blank_layout = prs.slide_layouts[6]
             
             for index, slide_data in enumerate(data["slides"]):
@@ -148,8 +147,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                     
                     if not has_chart:
                         try:
-                            # TO'G'RILANDI: Unsplash API qidiruv tizimi manzillari va rasmni yuklash logikasi yakunlandi
-                            img_url = "https://unsplash.com" # Zaxira rasm
+                            img_url = "https://unsplash.com"
                             search_url = f"https://unsplash.com{img_keyword}&per_page=1&client_id=p_Yv4wVv-XqM-HwG5HqRfZC-CqO-E498_r6VpXh1Y2Y"
                             
                             res_search = requests.get(search_url, timeout=5)
@@ -175,192 +173,10 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
         except Exception as e:
             st.error(f"Xato yuz berdi: {str(e)}")
 
-# TO'G'RILANDI: Yuklab olish tugmasi qo'shildi
 if st.session_state.file_ready and st.session_state.ppt_data is not None:
     st.download_button(
         label="Prezentatsiyani yuklab olish (.pptx)", 
         data=st.session_state.ppt_data, 
         file_name=f"{topic.replace(' ', '_')}.pptx",
-import streamlit as st
-from pptx import Presentation
-from pptx.util import Inches, Pt
-from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN
-from pptx.enum.chart import XL_CHART_TYPE
-from pptx.chart.data import CategoryChartData
-from google import genai
-import json
-import requests
-from io import BytesIO
-
-# --- API KALITNI STREAMLIT SECRETS ORQALI O'QISH ---
-try:
-    # TO'G'RILANDI: Bo'sh joyga "GEMINI_API_KEY" yozildi
-    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
-except:
-    GEMINI_API_KEY = "KALIT_SOZLANMAGAN"
-
-# TO'G'RILANDI: Ishlamaydigan havola haqiqiy rasm manziliga almashtirildi (Logotip muammosi hal qilindi)
-LOGO_URL = "https://githubusercontent.com"
-
-st.set_page_config(page_title="NeoBiology Multimedia AI", page_icon="🧬", layout="wide")
-
-# ---- INTERFEYS DIZAYNI ----
-col1, col2 = st.columns(2)
-with col1:
-    try:
-        st.image(LOGO_URL, width=90)
-    except:
-        st.write("🧬 LOGO")
-with col2:
-    st.markdown("<h1 style='margin: 0; padding: 0;'>NeoBiology — Multimedia & 3D AI Presentation Maker</h1>", unsafe_allow_html=True)
-    st.write("Sarlavhalari Schoolbell, matnlari Comic Sans, rasmlar va diagrammalarni avtomatik joylovchi platforma.")
-
-topic = st.text_input("Prezentatsiya mavzusini kiriting:", "Yurak qon-tomir tizimi va uning statistikasi")
-
-def hex_to_rgb(hex_str):
-    hex_str = hex_str.lstrip('#')
-    return RGBColor(*(int(hex_str[i:i+2], 16) for i in (0, 2, 4)))
-
-# Инициализируем флаг готовности файла в сессии Streamlit
-if "file_ready" not in st.session_state:
-    st.session_state.file_ready = False
-if "ppt_data" not in st.session_state:
-    st.session_state.ppt_data = None
-
-if st.button("Multimedia 3D Slayd Yaratish 🚀"):
-    if GEMINI_API_KEY == "KALIT_SOZLANMAGAN" or GEMINI_API_KEY == "":
-        st.error("Iltimos, avval Streamlit Cloud panelidagi 'Manage app' -> 'Settings' -> 'Secrets' qismiga GEMINI_API_KEY kalitingizni kiriting!")
-    else:
-        st.info("🤖 NeoBiology AI matnlar tuzmoqda, rasmlar qidirmoqda va diagrammalar chizmoqda...")
-        st.session_state.file_ready = False
-        
-        try:
-            client = genai.Client(api_key=GEMINI_API_KEY)
-            
-            prompt = f"""
-            Mavzu: '{topic}'.
-            Ushbu mavzu bo'yicha kamida 10 ta slayddan iborat multimedia taqdimotini tayyorla.
-            Mavzu tabiatidan kelib chiqib 3 ta mos rang (HEX formatida) tanla:
-            1. 'background_dark' (To'q fon uchun)
-            2. 'accent_color' (Yorqin elementlar va ramkalar uchun)
-            3. 'text_dark' (Matnlar uchun)
-
-            Har bir slayd uchun aniq 'title', 'content', 'image_keyword' (slaydga mos inglizcha 1-2 so'zli rasm qidiruv kaliti) va 'has_chart' (true/false - agarda slaydda statistika bo'lsa true qil) bo'lsin.
-            Chart ma'lumotlari uchun 'chart_data' kirit, masalan: {{"categories": ["Erkaklar", "Ayollar"], "values": [45, 55]}}. Agarda has_chart false bo'lsa buni null qil.
-            Javobni faqat quyidagi JSON formatida qaytar, hech qanday qo'shimcha gap yozma:
-            {{
-                "colors": {{
-                    "background_dark": "#HEX",
-                    "accent_color": "#HEX",
-                    "text_dark": "#HEX"
-                }},
-                "slides": [
-                    {{
-                        "title": "Slayd sarlavhasi", 
-                        "content": "Tezis 1\\nTezis 2",
-                        "image_keyword": "heart anatomy",
-                        "has_chart": false,
-                        "chart_data": null
-                    }}
-                ]
-            }}
-            Javob toza o'zbek tilida va qat'iy JSON formatida bo'lishi shart.
-            """
-            
-            # Barqaror Gemini modeli tanlandi
-            response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
-            raw_text = response.text.strip().replace("```json", "").replace("```", "")
-            data = json.loads(raw_text)
-            
-            color_config = data["colors"]
-            BG_DARK = hex_to_rgb(color_config["background_dark"])
-            ACCENT = hex_to_rgb(color_config["accent_color"])
-            TXT_DARK = hex_to_rgb(color_config["text_dark"])
-            SHADOW_COLOR = RGBColor(203, 213, 225) 
-            LIGHT_GRAY = RGBColor(248, 250, 252)    
-            
-            prs = Presentation()
-            prs.slide_width = Inches(13.33)
-            prs.slide_height = Inches(7.5)
-            # TO'G'RILANDI: Slayd andozasi uchun indeks qo'shildi
-            blank_layout = prs.slide_layouts[6]
-            
-            for index, slide_data in enumerate(data["slides"]):
-                slide = prs.slides.add_slide(blank_layout)
-                title_text = str(slide_data["title"]).replace("**", "").replace("#", "")
-                body_text = str(slide_data["content"])
-                img_keyword = slide_data.get("image_keyword", "biology")
-                has_chart = slide_data.get("has_chart", False)
-                
-                if index == 0 or index == len(data["slides"]) - 1:
-                    bg = slide.shapes.add_shape(1, 0, 0, prs.slide_width, prs.slide_height)
-                    bg.fill.solid(); bg.fill.fore_color.rgb = BG_DARK; bg.line.fill.background()
-                    
-                    shadow = slide.shapes.add_shape(1, Inches(0.45), Inches(0.45), prs.slide_width - Inches(0.8), prs.slide_height - Inches(0.8))
-                    shadow.fill.background(); shadow.line.color.rgb = RGBColor(30, 41, 59); shadow.line.width = Pt(3)
-                    
-                    border = slide.shapes.add_shape(1, Inches(0.4), Inches(0.4), prs.slide_width - Inches(0.8), prs.slide_height - Inches(0.8))
-                    border.fill.background(); border.line.color.rgb = ACCENT; border.line.width = Pt(3)
-                    
-                    t_box = slide.shapes.add_textbox(Inches(1.5), Inches(2.8), Inches(10.33), Inches(2))
-                    p = t_box.text_frame.paragraphs[0]
-                    p.text = title_text; p.font.size = Pt(48); p.font.bold = True; p.font.name = "Schoolbell"; p.font.color.rgb = ACCENT; p.alignment = PP_ALIGN.CENTER
-                else:
-                    bg = slide.shapes.add_shape(1, 0, 0, prs.slide_width, prs.slide_height)
-                    bg.fill.solid(); bg.fill.fore_color.rgb = LIGHT_GRAY; bg.line.fill.background()
-                    
-                    shadow_border = slide.shapes.add_shape(1, Inches(0.55), Inches(0.55), prs.slide_width - Inches(1.0), prs.slide_height - Inches(1.0))
-                    shadow_border.fill.background(); shadow_border.line.color.rgb = SHADOW_COLOR; shadow_border.line.width = Pt(2.5)
-                    
-                    main_border = slide.shapes.add_shape(1, Inches(0.5), Inches(0.5), prs.slide_width - Inches(1.0), prs.slide_height - Inches(1.0))
-                    main_border.fill.background(); main_border.line.color.rgb = ACCENT; main_border.line.width = Pt(2.5)
-                    
-                    t_box = slide.shapes.add_textbox(Inches(1.2), Inches(0.6), Inches(11), Inches(1))
-                    p = t_box.text_frame.paragraphs[0]
-                    p.text = title_text; p.font.size = Pt(34); p.font.bold = True; p.font.name = "Schoolbell"; p.font.color.rgb = BG_DARK
-                    
-                    b_box = slide.shapes.add_textbox(Inches(1.2), Inches(2.2), Inches(6.5), Inches(4.5))
-                    tf_b = b_box.text_frame; tf_b.word_wrap = True
-                    
-                    lines = [l.strip() for l in body_text.split("\n") if l.strip()]
-                    for idx, line in enumerate(lines):
-                        p_b = tf_b.paragraphs[0] if idx == 0 else tf_b.add_paragraph()
-                        p_b.text = line.replace("- ", "• ").replace("*", "")
-                        p_b.font.size = Pt(18); p_b.font.name = "Comic Sans MS"; p_b.font.color.rgb = TXT_DARK; p_b.space_after = Pt(12)
-                    
-                    if not has_chart:
-                        try:
-                            # TO'G'RILANDI: Unsplash API qidiruv tizimi manzillari va rasmni yuklash logikasi yakunlandi
-                            img_url = "https://unsplash.com" # Zaxira rasm
-                            search_url = f"https://unsplash.com{img_keyword}&per_page=1&client_id=p_Yv4wVv-XqM-HwG5HqRfZC-CqO-E498_r6VpXh1Y2Y"
-                            
-                            res_search = requests.get(search_url, timeout=5)
-                            if res_search.status_code == 200:
-                                res_json = res_search.json()
-                                if res_json.get("results"):
-                                    img_url = res_json["results"][0]["urls"]["small"]
-                            
-                            img_res = requests.get(img_url, timeout=5)
-                            if img_res.status_code == 200:
-                                img_bytes = BytesIO(img_res.content)
-                                slide.shapes.add_picture(img_bytes, Inches(8.0), Inches(2.2), width=Inches(4.5))
-                        except Exception as e:
-                            pass
-
-            # Faylni saqlash
-            ppt_io = BytesIO()
-            prs.save(ppt_io)
-            st.session_state.ppt_data = ppt_io.getvalue()
-            st.session_state.file_ready = True
-            st.success("Prezentatsiya muvaffaqiyatli yaratildi!")
-
-        except Exception as e:
-            st.error(f"Xato yuz berdi: {str(e)}")
-
-# TO'G'RILANDI: Yuklab olish tugmasi qo'shildi
-if st.session_state.file_ready and st.session_state.ppt_data is not None:
-    st.download_button(
-        label="Prezentatsiyani yuklab olish (.pptx)", 
-        data=st.session_state.ppt_data, 
-        file_name=f"{topic.replace(' ', '_')}.pptx",
+        mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    )
