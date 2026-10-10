@@ -83,7 +83,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                     }}
                 ]
             }}
-            Javob toza o'zbek tilida va qat'iy JSON formatida bo'lishi shart.
+            Javob toza o'zbek tilida va qat'iy JSON formatida bo'shi shart.
             """
             
             response = client.models.generate_content(model='gemini-3.8-flash', contents=prompt)
@@ -154,7 +154,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                             search_url = f"https://unsplash.com{img_keyword}&per_page=1&client_id=p_Yv4wVv-XqM-HwG5HqRfZC-CqO-E498_r6VpXh1Y2Y"
                             res_search = requests.get(search_url, timeout=5).json()
                             if res_search.get("results"):
-                                img_url = res_search["results"]["urls"]["small"]
+                                img_url = res_search["results"][0]["urls"]["small"]
                             
                             img_res = requests.get(img_url, timeout=5)
                             if img_res.status_code == 200:
@@ -175,4 +175,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                             chart = slide.shapes.add_chart(XL_CHART_TYPE.COLUMN_CLUSTERED, x, y, cx, cy, chart_data).chart
                             chart.has_legend = False
                         except:
-                               pass
+                            pass
+                            
+                    # ---- LOGOTIPNI JOYLASHTIRISH ----
+                    if logo_file:
