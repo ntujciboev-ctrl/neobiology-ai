@@ -177,4 +177,5 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                         except:
                             pass
                             
-                    # ---- LOGOTIPNI JOYLASHTIRISH (AKURATNY EFFECT) ----
+                    # ---- LOGOTIPNI JOYLASHTIRISH ----
+                    if logo_file:
