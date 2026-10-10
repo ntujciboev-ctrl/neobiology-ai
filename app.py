@@ -13,7 +13,7 @@ from io import BytesIO
 
 # --- API KALITNI STREAMLIT SECRETS ORQALI XAVFSIZ O'QISH ---
 try:
-    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+    GEMINI_API_KEY = st.secrets["AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"]
 except:
     GEMINI_API_KEY = "KALIT_SOZLANMAGAN"
 
@@ -177,5 +177,4 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                         except:
                             pass
                             
-                    # ---- LOGOTIPNI JOYLASHTIRISH ----
-                    if logo_file:
+                    # ---- LOGOTIPNI JOYLASHTIRISH (AKURATNY EFFECT) ----
