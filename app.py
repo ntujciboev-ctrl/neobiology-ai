@@ -12,7 +12,7 @@ from io import BytesIO
 
 # --- API KALITNI STREAMLIT SECRETS ORQALI O'QISH ---
 try:
-    GEMINI_API_KEY = st.secrets["AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"]
+    GEMINI_API_KEY = st.secrets[]
 except:
     GEMINI_API_KEY = "AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"
 
