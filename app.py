@@ -22,7 +22,7 @@ LOGO_URL = "https://githubusercontent.com"
 st.set_page_config(page_title="NeoBiology Multimedia AI", page_icon="🧬", layout="wide")
 
 # ---- INTERFEYS DIZAYNI ----
-col1, col2 = st.columns([1, 8])
+col1, col2 = st.columns()
 with col1:
     st.image(LOGO_URL, width=90)
 with col2:
@@ -35,11 +35,16 @@ def hex_to_rgb(hex_str):
     hex_str = hex_str.lstrip('#')
     return RGBColor(*(int(hex_str[i:i+2], 16) for i in (0, 2, 4)))
 
+# Инициализируем флаг готовности файла в сессии Streamlit
+if "file_ready" not in st.session_state:
+    st.session_state.file_ready = False
+
 if st.button("Multimedia 3D Slayd Yaratish 🚀"):
     if GEMINI_API_KEY == "KALIT_SOZLANMAGAN" or GEMINI_API_KEY == "":
         st.error("Iltimos, avval Streamlit Cloud panelidagi 'Manage app' -> 'Settings' -> 'Secrets' qismiga GEMINI_API_KEY kalitingizni kiriting!")
     else:
         st.info("🤖 NeoBiology AI matnlar tuzmoqda, rasmlar qidirmoqda va diagrammalar chizmoqda...")
+        st.session_state.file_ready = False
         
         try:
             client = genai.Client(api_key=GEMINI_API_KEY)
@@ -167,9 +172,9 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                     except:
                         pass
             
-            file_name = "neobiology_multimedia.pptx"
-            prs.save(file_name)
+            prs.save("neobiology_multimedia.pptx")
+            st.session_state.file_ready = True
             st.success(f"🎉 NeoBiology Multimedia AI {len(data['slides'])} ta mukammal slayd tayyorladi!")
-            
-            with open(file_name, "rb") as file:
-                st.download_button(label="Multimedia Slaydni yuklab olish (.pptx)", data=file, file_name=file_name, mime="application/vnd.openxmlformats-officedocument.presentationml.presentation")
+        except Exception as e:
+            st.error(f"Xatolik yuz berdi: {e}")
+
