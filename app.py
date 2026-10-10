@@ -14,7 +14,7 @@ from io import BytesIO
 try:
     GEMINI_API_KEY = st.secrets["AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"]
 except:
-    GEMINI_API_KEY = "KALIT_SOZLANMAGAN"
+    GEMINI_API_KEY = "AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"
 
 # Haqiqiy rasm havolasi (Logotip muammosi to'liq hal qilindi)
 LOGO_URL = "https://githubusercontent.com"
