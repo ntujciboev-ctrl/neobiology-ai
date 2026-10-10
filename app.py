@@ -9,17 +9,29 @@ import json
 # API KALITINGIZNI SHU YERGA QO'YING:
 GEMINI_API_KEY = "AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"
 
-# --- SERVER UCHUN MUKAMMAL LOGOTIP LOGIKASI ---
-# Dunyodagi har qanday brauzer yuklay oladigan xavfsiz va barqaror havola
-LOGO_URL = "https://githubusercontent.com"
+# --- LOGOTIP NOMINI AVTOMATIK ANIQLASH (XATO bermaydigan UDLUB) ---
+logo_file = None
+possible_logos = ["logo.png", "logo.png.png", "logo.PNG", "logo.jpg"]
+for name in possible_logos:
+    if os.path.exists(name):
+        logo_file = name
+        break
 
-st.set_page_config(page_title="NeoBiology AI", page_icon=LOGO_URL, layout="wide")
+# Brauzer tabidagi belgi sozlamasi
+if logo_file:
+    st.set_page_config(page_title="NeoBiology AI", page_icon=logo_file, layout="wide")
+else:
+    st.set_page_config(page_title="NeoBiology AI", page_icon="🧬", layout="wide")
 
-# Interfeys qismi
-col1, col2 = st.columns([1, 8])
+# ---- INTERFEYS DIZAYNI ----
+col1, col2 = st.columns([1, 9]) # Rasm va sarlavha mutanosibligi
 
 with col1:
-    st.image(LOGO_URL, width=100) # Sayt tepasidagi dumaloq yashil rasm
+    if logo_file:
+        st.image(logo_file, width=90) # Kompyuter faylni qanday nomlaganidan qat'iy nazar rasm ochiladi!
+    else:
+        st.markdown("<h1 style='color: #10b981; margin: 0;'>🧬</h1>", unsafe_allow_html=True)
+
 
 with col2:
     st.markdown("<h1 style='margin:0; padding:0;'>NeoBiology — Professional 3D AI Presentation Maker</h1>", unsafe_allow_html=True)
