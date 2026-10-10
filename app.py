@@ -174,4 +174,4 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                             x, y, cx, cy = Inches(8.0), Inches(2.2), Inches(4.5), Inches(4.2)
                             chart = slide.shapes.add_chart(XL_CHART_TYPE.COLUMN_CLUSTERED, x, y, cx, cy, chart_data).chart
                             chart.has_legend = False
-                        except
+                        except:
