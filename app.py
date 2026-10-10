@@ -177,4 +177,4 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
 
 # Fayl tayyor bo'lgach yuklash tugmasi chiqadi
 if st.session_state.file_ready:
-    st.download_button(
+    st.download_button()
