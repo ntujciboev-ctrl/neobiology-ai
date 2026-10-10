@@ -10,7 +10,6 @@ import json
 import os
 import requests
 from io import BytesIO
-from PIL import Image
 
 # FAQAT SHU YERGA API KALITINGIZNI QO'YING:
 GEMINI_API_KEY = "AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"
@@ -29,7 +28,7 @@ else:
     st.set_page_config(page_title="NeoBiology Multimedia AI", page_icon="🧬", layout="wide")
 
 # ---- INTERFEYS DIZAYNI ----
-col1, col2 = st.columns([1, 8])
+col1, col2 = st.columns()
 with col1:
     if logo_file:
         st.image(logo_file, width=90)
@@ -59,8 +58,8 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
         2. 'accent_color' (Yorqin elementlar va ramkalar uchun)
         3. 'text_dark' (Matnlar uchun)
 
-        Har bir slayd uchun aniq 'title', 'content', 'image_keyword' (slaydga mos inglizcha 1-2 so'zli rasm qidiruv kaliti) va 'has_chart' (true/false - agarda slaydda statistika, taqqoslash yoki foizlar bo'lsa true qil) bo'lsin.
-        Chart ma'lumotlari uchun 'chart_data' kirit: {{'categories': ['A', 'B'], 'values': [40, 60]}}.
+        Har bir slayd uchun aniq 'title', 'content', 'image_keyword' (slaydga mos inglizcha 1-2 so'zli rasm qidiruv kaliti, masalan 'heart cells') va 'has_chart' (true/false - agarda slaydda statistika, taqqoslash yoki foizlar bo'lsa true qil) bo'lsin.
+        Chart ma'lumotlari uchun 'chart_data' kirit, masalan: {{"categories": ["Erkaklar", "Ayollar"], "values": [55, 45]}}. Agarda has_chart false bo'lsa buni null qil.
         Javobni faqat quyidagi JSON formatida qaytar, hech qanday qo'shimcha gap yozma:
         {{
             "colors": {{
@@ -72,7 +71,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                 {{
                     "title": "Slayd sarlavhasi", 
                     "content": "Tezis 1\\nTezis 2",
-                    "image_keyword": "heart biology",
+                    "image_keyword": "heart anatomy",
                     "has_chart": false,
                     "chart_data": null
                 }}
@@ -95,7 +94,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
         prs = Presentation()
         prs.slide_width = Inches(13.33)
         prs.slide_height = Inches(7.5)
-        blank_layout = prs.slide_layouts
+        blank_layout = prs.slide_layouts[6] # Toza bo'sh slayd
         
         for index, slide_data in enumerate(data["slides"]):
             slide = prs.slides.add_slide(blank_layout)
@@ -132,7 +131,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                 p = t_box.text_frame.paragraphs[0]
                 p.text = title_text; p.font.size = Pt(34); p.font.bold = True; p.font.name = "Schoolbell"; p.font.color.rgb = BG_DARK
                 
-                # JURNAL MULTIMEDIA VERSTKASI: Matn chapda (kengligi 6.5 dyuym)
+                # JURNAL MULTIMEDIA VERSTKASI: Matn chapda
                 b_box = slide.shapes.add_textbox(Inches(1.2), Inches(2.2), Inches(6.5), Inches(4.5))
                 tf_b = b_box.text_frame; tf_b.word_wrap = True
                 
@@ -142,10 +141,17 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                     p_b.text = line.replace("- ", "• ").replace("*", "")
                     p_b.font.size = Pt(18); p_b.font.name = "Comic Sans MS"; p_b.font.color.rgb = TXT_DARK; p_b.space_after = Pt(12)
                 
-                # ---- MULTIMEDIA 1: AQLLI RASYM QO'SHISH (UNSPLASH ORQALI) ----
+                # ---- MULTIMEDIA 1: AQLLI RASYM QO'SHISH ----
                 if not has_chart:
                     try:
-                        img_url = f"https://unsplash.com?{img_url_keyword}"
+                        # Pixabay / Unsplash ochiq redirect tizimi orqali rasmni olish
+                        img_url = f"https://unsplash.com" 
+                        # Kalit so'z bo'yicha dinamik qidiruv API linki
+                        search_url = f"https://unsplash.com{img_keyword}&per_page=1&client_id=p_Yv4wVv-XqM-HwG5HqRfZC-CqO-E498_r6VpXh1Y2Y"
+                        res_search = requests.get(search_url, timeout=5).json()
+                        if res_search.get("results"):
+                            img_url = res_search["results"][0]["urls"]["small"]
+                        
                         img_res = requests.get(img_url, timeout=5)
                         if img_res.status_code == 200:
                             img_stream = BytesIO(img_res.content)
@@ -177,4 +183,3 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
         with open(file_name, "rb") as file:
             st.download_button(label="Multimedia Slaydni yuklab olish (.pptx)", data=file, file_name=file_name, mime="application/vnd.openxmlformats-officedocument.presentationml.presentation")
     except Exception as e:
-        st.error(f"Xatolik yuz berdi: {e}")
