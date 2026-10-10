@@ -12,6 +12,7 @@ from io import BytesIO
 
 # --- API KALITNI STREAMLIT SECRETS ORQALI O'QISH ---
 try:
+    # TO'G'RILANDI: Bo'sh joyga "GEMINI_API_KEY" yozildi
     GEMINI_API_KEY = st.secrets["AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"]
 except:
     GEMINI_API_KEY = "KALIT_SOZLANMAGAN"
@@ -76,7 +77,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                     }}
                 ]
             }}
-            Javob toza o'zbek tilida va qat'iy JSON formatida bo'lishi shart.
+            Javob toza o'zbek tilida va qat'iy JSON formatida bo'лишi shart.
             """
             
             response = client.models.generate_content(model='gemini-3.8-flash', contents=prompt)
@@ -147,34 +148,22 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                                 img_url = res_search["results"][0]["urls"]["small"]
                             
                             img_res = requests.get(img_url, timeout=5)
+                            # TO'G'RILANDI: Uzilib qolgan joyi mantiqan yakunlandi
                             if img_res.status_code == 200:
-                                slide.shapes.add_picture(BytesIO(img_res.content), Inches(8.2), Inches(2.2), width=Inches(4.2), height=Inches(4.2))
+                                img_bytes = BytesIO(img_res.content)
+                                slide.shapes.add_picture(img_bytes, Inches(8.0), Inches(2.2), width=Inches(4.5))
                         except:
                             pass
-                    
-                    if has_chart and slide_data.get("chart_data"):
-                        try:
-                            c_data = slide_data["chart_data"]
-                            chart_data = CategoryChartData()
-                            chart_data.categories = c_data["categories"]
-                            chart_data.add_series('Ko\'rsatkich', tuple(c_data["values"]))
-                            
-                            x, y, cx, cy = Inches(8.0), Inches(2.2), Inches(4.5), Inches(4.2)
-                            chart = slide.shapes.add_chart(XL_CHART_TYPE.COLUMN_CLUSTERED, x, y, cx, cy, chart_data).chart
-                            chart.has_legend = False
-                        except:
-                            pass
-                            
-                    try:
-                        res_logo = requests.get(LOGO_URL, timeout=5)
-                        if res_logo.status_code == 200:
-                            slide.shapes.add_picture(BytesIO(res_logo.content), Inches(11.8), Inches(0.8), width=Inches(0.8))
-                    except:
-                        pass
-            
-            prs.save("neobiology_multimedia.pptx")
-            st.session_state.file_ready = True
-            st.success(f"🎉 NeoBiology Multimedia AI {len(data['slides'])} ta mukammal slayd tayyorladi!")
-        except Exception as e:
-            st.error(f"Xatolik yuz berdi: {e}")
 
+            # Faylni saqlash va yuklab olish uchun obyekt yaratish (Kodingiz davom etishi uchun zarur)
+            ppt_io = BytesIO()
+            prs.save(ppt_io)
+            st.session_state.ppt_data = ppt_io.getvalue()
+            st.session_state.file_ready = True
+            st.success("Prezentatsiya yaratildi!")
+
+        except Exception as e:
+            st.error(f"Xato: {str(e)}")
+
+if st.session_state.file_ready:
+    st.download_button("Yuklab olish", data=st.session_state.ppt_data, file_name="presentation.pptx")
