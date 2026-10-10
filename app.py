@@ -10,13 +10,7 @@ import json
 import requests
 from io import BytesIO
 
-# --- API KALITNI STREAMLIT SECRETS ORQALI O'QISH ---
-try:
-    GEMINI_API_KEY = st.secrets[]
-except:
-    GEMINI_API_KEY = "AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"
-
-# Haqiqiy rasm havolasi (Logotip muammosi to'liq hal qilindi)
+# Toza va ishchi logotip havolasi
 LOGO_URL = "https://githubusercontent.com"
 
 st.set_page_config(page_title="NeoBiology Multimedia AI", page_icon="🧬", layout="wide")
@@ -32,27 +26,31 @@ with col2:
     st.markdown("<h1 style='margin: 0; padding: 0;'>NeoBiology — Multimedia & 3D AI Presentation Maker</h1>", unsafe_allow_html=True)
     st.write("Sarlavhalari Schoolbell, matnlari Comic Sans, rasmlar va diagrammalarni avtomatik joylovchi platforma.")
 
+# TO'G'RILANDI: Kalit yozish uchun yagona joy ekranning o'ziga ko'chirildi
+GEMINI_API_KEY = st.text_input("AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ", type="password", help="Kalitni https://google.com saytidan olishingiz mumkin.")
+
 topic = st.text_input("Prezentatsiya mavzusini kiriting:", "Yurak qon-tomir tizimi va uning statistikasi")
 
 def hex_to_rgb(hex_str):
     hex_str = hex_str.lstrip('#')
     return RGBColor(*(int(hex_str[i:i+2], 16) for i in (0, 2, 4)))
 
-# Инициализируем флаг готовности файла в сессии Streamlit
+# Streamlit sessiyasida fayl holatlarini saqlash
 if "file_ready" not in st.session_state:
     st.session_state.file_ready = False
 if "ppt_data" not in st.session_state:
     st.session_state.ppt_data = None
 
 if st.button("Multimedia 3D Slayd Yaratish 🚀"):
-    if GEMINI_API_KEY == "KALIT_SOZLANMAGAN" or GEMINI_API_KEY == "":
-        st.error("Iltimos, avval Streamlit Cloud panelidagi 'Manage app' -> 'Settings' -> 'Secrets' qismiga GEMINI_API_KEY kalitingizni kiriting!")
+    # Tekshiruv: agar kalit kiritilmagan bo'lsa xato beradi
+    if not GEMINI_API_KEY.strip():
+        st.error("Iltimos, avval Google Gemini API kalitingizni tepadagi maydonga kiriting!")
     else:
-        st.info("🤖 NeoBiology AI matnlar tuzmoqda, rasmlar qidirmoqda va diagrammalar chizmoqda...")
+        st.info("🤖 NeoBiology AI matnlar tuzmoqda, rasmlar qidirmoqda va slaydlar tayyorlamoqda...")
         st.session_state.file_ready = False
         
         try:
-            client = genai.Client(api_key=GEMINI_API_KEY)
+            client = genai.Client(api_key=GEMINI_API_KEY.strip())
             
             prompt = f"""
             Mavzu: '{topic}'.
@@ -84,7 +82,7 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
             Javob toza o'zbek tilida va qat'iy JSON formatida bo'lishi shart.
             """
             
-            # Barqaror Gemini modeli
+            # Model barqaror versiyaga sozlandi
             response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
             raw_text = response.text.strip().replace("```json", "").replace("```", "")
             data = json.loads(raw_text)
@@ -99,7 +97,6 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
             prs = Presentation()
             prs.slide_width = Inches(13.33)
             prs.slide_height = Inches(7.5)
-            # Indeks qo'shildi (blank slayd tartibi uchun)
             blank_layout = prs.slide_layouts[6]
             
             for index, slide_data in enumerate(data["slides"]):
@@ -168,11 +165,12 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
             prs.save(ppt_io)
             st.session_state.ppt_data = ppt_io.getvalue()
             st.session_state.file_ready = True
-            st.success("Prezentatsiya muvaffaqiyatli yaratildi!")
+            st.success("🎉 Prezentatsiya muvaffaqiyatli yaratildi!")
 
         except Exception as e:
             st.error(f"Xato yuz berdi: {str(e)}")
 
+# Yuklab olish tugmasi
 if st.session_state.file_ready and st.session_state.ppt_data is not None:
     st.download_button(
         label="Prezentatsiyani yuklab olish (.pptx)", 
