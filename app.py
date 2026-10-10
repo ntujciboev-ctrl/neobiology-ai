@@ -176,6 +176,5 @@ if st.button("Multimedia 3D Slayd Yaratish 🚀"):
                             chart.has_legend = False
                         except:
                             pass
-                            
+                            finally
                     # ---- LOGOTIPNI JOYLASHTIRISH ----
-                       finally
