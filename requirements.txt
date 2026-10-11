@@ -1,4 +1,6 @@
+streamlit
 google-genai
 python-pptx
-requests
 pillow
+requests
+
