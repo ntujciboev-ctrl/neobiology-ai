@@ -18,7 +18,7 @@ from google import genai
 try:
     GEMINI_API_KEY = st.secrets["AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"]
 except:
-    GEMINI_API_KEY = ""
+    GEMINI_API_KEY = "AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"
 
 # ==========================
 # PAGE SETTINGS
