@@ -1,7 +1,4 @@
 import streamlit as st
-
-st.title("TEST APP 999")
-st.stop()
 import streamlit as st
 import json
 from io import BytesIO
@@ -12,7 +9,7 @@ from pptx import Presentation
 # ==========================================
 # FAQAT SHU YERGA API KEY YOZING
 # ==========================================
-GEMINI_API_KEY = "AQ.Ab8RN6KMdSgmCWJENHgtWShKwc0hbhv0GUgopLNs3uNX7zKuKw"
+GEMINI_API_KEY = "AQ.Ab8RN6IpgIegOncfv15AItZAUmxtbF7FAbxOrnlXRYH4PlMOwg"
 
 # ==========================================
 # PAGE
