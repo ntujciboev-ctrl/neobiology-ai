@@ -7,7 +7,7 @@ from pptx import Presentation
 # ==========================================
 # FAQAT SHU YERGA API KEY YOZING
 # ==========================================
-GEMINI_API_KEY = "AQ.Ab8RN6Kzk9c3QrTOugmqiT_a_OCoQ_aVsssRKUZxc_7Kt2pISA"
+GEMINI_API_KEY = "AQ.Ab8RN6L_GD0DVlsw9vr28N8xOzuqOYweUq-dpoKEwN5qgripPA"
 
 # ==========================================
 # PAGE CONFIG
@@ -47,7 +47,7 @@ def generate_slides(topic):
     """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.8-flash",
         contents=prompt
     )
 
