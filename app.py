@@ -1,69 +1,50 @@
 import streamlit as st
 import json
 from io import BytesIO
-import streamlit as st
-
-st.error("TEST_2026")
-from pptx import Presentation
-from pptx.util import Pt
 
 from google import genai
+from pptx import Presentation
 
+# ==========================================
+# FAQAT SHU YERGA API KEY YOZING
+# ==========================================
+GEMINI_API_KEY = "AQ_SIZNING_API_KEY"
 
-# ==================================================
-# FAQAT SHU YERDA API KALITNI YOZING
-# ==================================================
-GEMINI_API_KEY = "AQ.Ab8RN6IzZgl3gy-fNXbYZePMEPU3DFwwaQhyBDEVdHRaSAMceQ"
-
-
-# ==================================================
-# SAHIFA SOZLAMALARI
-# ==================================================
+# ==========================================
+# PAGE
+# ==========================================
 st.set_page_config(
-    page_title="NeoBiology Multimedia AI",
+    page_title="NeoBiology AI",
     page_icon="🧬",
     layout="wide"
 )
 
-# ==================================================
-# LOGOTIP
-# logo.png faylni app.py bilan bir papkaga joylashtiring
-# ==================================================
-try:
-    st.image("logo.png", width=120)
-except:
-    st.write("🧬")
+st.title("🧬 NeoBiology AI")
 
-st.title("NeoBiology Multimedia AI")
-st.write("Gemini AI yordamida avtomatik PPT yaratish tizimi")
-
-# ==================================================
-# MAVZU
-# ==================================================
 topic = st.text_input(
-    "Prezentatsiya mavzusi:",
-    "Yurak qon tomir tizimi"
+    "Mavzu kiriting:",
+    "Prokariot hujayra va mikrobiologiya"
 )
 
-# ==================================================
-# GEMINI ORQALI MAZMUN YARATISH
-# ==================================================
+# ==========================================
+# GEMINI
+# ==========================================
 def generate_slides(topic):
 
     client = genai.Client(
-        api_key=GEMINI_API_KEY
+        api_key=GEMINI_API_KEY.strip()
     )
 
     prompt = f"""
-    '{topic}' mavzusida 10 ta slayd yarating.
+    '{topic}' mavzusida 10 ta slayd tayyorla.
 
-    Faqat JSON formatida qaytaring.
+    Faqat JSON qaytar.
 
     {{
       "slides":[
         {{
-          "title":"Slayd sarlavhasi",
-          "content":"2-4 ta qisqa punkt"
+          "title":"Sarlavha",
+          "content":"Matn"
         }}
       ]
     }}
@@ -81,80 +62,51 @@ def generate_slides(topic):
 
     return json.loads(text)
 
-
-# ==================================================
-# PPT YARATISH
-# ==================================================
-def create_ppt(slides):
+# ==========================================
+# PPT
+# ==========================================
+def create_ppt(data):
 
     prs = Presentation()
 
-    for slide_item in slides:
+    for slide_data in data["slides"]:
 
         slide = prs.slides.add_slide(
             prs.slide_layouts[1]
         )
 
-        slide.shapes.title.text = slide_item["title"]
+        slide.shapes.title.text = slide_data["title"]
 
-        slide.placeholders[1].text = slide_item["content"]
+        slide.placeholders[1].text = slide_data["content"]
 
-        title = slide.shapes.title.text_frame
+    buffer = BytesIO()
 
-        for paragraph in title.paragraphs:
-            paragraph.font.size = Pt(24)
+    prs.save(buffer)
 
-    ppt_buffer = BytesIO()
+    return buffer.getvalue()
 
-    prs.save(ppt_buffer)
-
-    return ppt_buffer.getvalue()
-
-
-# ==================================================
-# TUGMA
-# ==================================================
+# ==========================================
+# BUTTON
+# ==========================================
 if st.button("🚀 PPT yaratish"):
 
-    if not GEMINI_API_KEY.strip():
+    try:
 
-        st.error(
-            "API kalit kiritilmagan."
+        st.info("Gemini ishlamoqda...")
+
+        data = generate_slides(topic)
+
+        ppt_file = create_ppt(data)
+
+        st.success("✅ Tayyor!")
+
+        st.download_button(
+            label="📥 PPT yuklab olish",
+            data=ppt_file,
+            file_name="presentation.pptx",
+            mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
         )
 
-    else:
+    except Exception as e:
 
-        try:
-
-            with st.spinner(
-                "Gemini AI slaydlarni yaratmoqda..."
-            ):
-
-                data = generate_slides(topic)
-
-                ppt_file = create_ppt(
-                    data["slides"]
-                )
-
-            st.success(
-                "✅ PPT muvaffaqiyatli yaratildi!"
-            )
-
-            st.download_button(
-                label="📥 PPT yuklab olish",
-                data=ppt_file,
-                file_name=f"{topic}.pptx",
-                mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
-            )
-
-        except json.JSONDecodeError:
-
-            st.error(
-                "Gemini JSON formatida javob qaytarmadi."
-            )
-
-        except Exception as e:
-
-            st.error(
-                f"Xatolik: {e}"
-            )
+        st.error(str(e))
