@@ -5,9 +5,9 @@ from google import genai
 from pptx import Presentation
 
 # ==========================================
-# FAQAT SHU YERGA API KEY YOZING
+# AQ... BILAN BOSHLanuvchi API KALITINGIZNI SHU YERGA YOZING
 # ==========================================
-GEMINI_API_KEY = "AQ.Ab8RN6L_GD0DVlsw9vr28N8xOzuqOYweUq-dpoKEwN5qgripPA"
+GEMINI_API_KEY = "AQ.Ab8RN6Luk6ZAsRo1wbOlhy4sYOroqv9IZRFC8egA51eliQ8UJw"  # O'zingiz olgan AQ... kalitni qo'shtirnoq ichiga qo'ying
 
 # ==========================================
 # PAGE CONFIG
@@ -46,6 +46,7 @@ def generate_slides(topic):
     }}
     """
 
+    # Model nomini tekshiramiz (gemini-2.0-flash yoki gemini-3.8-flash)
     response = client.models.generate_content(
         model="gemini-3.8-flash",
         contents=prompt
@@ -94,4 +95,4 @@ if st.button("🚀 PPT yaratish"):
         )
 
     except Exception as e:
-        st.error(str(e))
+        st.error(f"Xatolik yuz berdi: {str(e)}")
