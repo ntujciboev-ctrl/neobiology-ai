@@ -7,7 +7,7 @@ from pptx import Presentation
 # ==========================================
 # FAQAT SHU YERGA API KEY YOZING
 # ==========================================
-GEMINI_API_KEY = "AQ.Ab8RN6IpgIegOncfv15AItZAUmxtbF7FAbxOrnlXRYH4PlMOwg"
+GEMINI_API_KEY = "AQ.Ab8RN6Kzk9c3QrTOugmqiT_a_OCoQ_aVsssRKUZxc_7Kt2pISA"
 
 # ==========================================
 # PAGE CONFIG
