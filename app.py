@@ -1,16 +1,17 @@
 import streamlit as st
 import json
+import os
 from io import BytesIO
-import google.generativeai as genai
+from google import genai
 from pptx import Presentation
 
 # ==========================================
-# AQ... TOKENINGIZNI SHU YERGA YOZING
+# AQ... BILAN BOSHLANUVCHI API KALITINGIZ
 # ==========================================
-GEMINI_API_KEY = "AQ.Ab8RN6Luk6ZAsRo1wbOlhy4sYOroqv9IZRFC8egA51eliQ8UJw"  # O'zingizdagi AQ... tokenni shu yerga qo'ying
+GEMINI_API_KEY = "AQ.Ab8RN6KdRyvoAOGvkcIZ_4MNaFIwm21JeJunpZwXpW7cjNP7WQ"
 
-# Konfiguratsiya qilish
-genai.configure(api_key=GEMINI_API_KEY.strip())
+# Tokenni muhit o'zgaruvchisiga o'rnatamiz
+os.environ["GEMINI_API_KEY"] = GEMINI_API_KEY.strip()
 
 # ==========================================
 # PAGE CONFIG
@@ -32,8 +33,8 @@ topic = st.text_input(
 # GEMINI FUNCTION
 # ==========================================
 def generate_slides(topic):
-    # Eski va barqaror modeldan foydalanamiz
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # Klientni avtomatik ravishda muhitdagi kalit orqali ishga tushiramiz
+    client = genai.Client()
 
     prompt = f"""
     '{topic}' mavzusida 10 ta slayd tayyorla.
@@ -48,9 +49,12 @@ def generate_slides(topic):
     }}
     """
 
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-3.8-flash",
+        contents=prompt
+    )
+
     text = response.text.strip()
-    
     text = text.replace("```json", "")
     text = text.replace("```", "")
 
